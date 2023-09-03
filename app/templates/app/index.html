@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">CookHub</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><button class="btn btn-warning"
+              style="color: white;">All Recipes</button></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'create' %}"><button class="btn btn-info" style="color: white;">New
+              Recipe</button></a>
+        </li>
+      </ul>
+      <div class="col-lg col-md-6 col-sm-12 col mx-auto">
+        <form action="{% url 'search' %}" class="search" method="GET">
+          <div class="input-group" style="width: 60%;">
+            <input class="form-control" type="text" placeholder="Search" name="keyword" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </div>
+
+        </form>
+      </div>
+      <!-- <div class="col-lg col-md-6 col-sm-12 col">
+        <form action="{% url 'search' %}" class="search" method="GET">
+          {% csrf_token %}
+          <div class="input-group w-100">
+            <input type="text" class="form-control" style="width: 60%" placeholder="Search" name="keyword" />
+
+            <div class="input-group-append">
+              <button class="btn btn-success" type="submit">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div> -->
+
+      {% if not request.user.is_authenticated %}
+      <a class="nav-link active" aria-current="page" href="{% url 'login' %}"><button class="btn btn-dark"
+          style="color: white;">Login</button></a>
+      {% else %}
+      <a class="nav-link active" aria-current="page" href="{% url 'logout' %}"><button class="btn btn-dark"
+          style="color: white;">Logout</button></a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+<!-- ========================= SECTION PAGETOP ========================= -->
+<section class="section-pagetop bg-custom">
+  <div class="container">
+    {% if  user.is_authenticated   %}
+    <header class="jumbotron my-4">
+      <h1 class="display-3">Welcome, {{request.user}}! We're delighted to have you here.</h1>
+      <p class="lead">Feel free to explore our extensive collection of various recipes, specially curated for you.</p>
+      <a href="{% url 'create' %}"><button class="btn btn-info btn-lg" style="color: white;">Post Your Recipe</button></a>
+    </header>
+    {% else %}
+    <header class="jumbotron my-4">
+      <h1 class="display-3">Welcome, guest! We're delighted to have you here.</h1>
+      <p class="lead">Feel free to explore our extensive collection of various recipes, specially curated for you.</p>
+      <a href="{% url 'create' %}"><button class="btn btn-info btn-lg" style="color: white;">Post Your Recipe</button></a>
+    </header>
+    {% endif %}
+  </div>
+  <!-- container //  -->
+</section>
+<!-- ========================= SECTION INTRO END// ========================= -->
+<div class="container">
+  <div class="text-center">
+    <h2 class="display-4">
+      {% if 'search' in request.path %}
+        Search Result
+      {% else %}
+        Our Recipes
+      {% endif %}
+    </h2>
+    <hr class="my-4">
+  </div>
+  
+  <div class="row text-center">
+    {% if recipes %}
+      {% for recipe in recipes %}
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+          <a href="{% url 'detail' recipe.id %}">
+            <img class="card-img-top" src="{{recipe.image.url}}" alt="{{recipe.name}}">
+          </a>
+          <div class="card-body">
+            <h4 class="card-title">
+              <a href="{% url 'detail' recipe.id %}" style="text-decoration: none;">
+                {{recipe.name}} Recipe
+              </a>
+            </h4>
+            <p class="card-text">{{recipe.description|truncatechars:65}}</p>
+            <ul class="list-unstyled">
+              <li><i class="fas fa-clock"></i>Preparation Time: {{recipe.prep}}</li>
+              <li><i class="fas fa-clock"></i>Cooking Time: {{recipe.cook}}</li>
+            </ul>
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'detail' recipe.id %}" class="btn btn-primary">View Details</a>
+          </div>
+        </div>
+      </div>
+      
+      {% endfor %}
+    {% else %}
+      <div class="col-md-12">
+        <p class="text-center">No recipes available at the moment. Check back later for more delicious recipes!</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+<style>
+  .bg-custom {
+    background-image: url('https://t3.ftcdn.net/jpg/02/57/29/88/360_F_257298837_B8n4pIKuxTVd2O9FyZAr44b4jU5FGnCH.jpg'); /* Replace 'your-image-url.jpg' with the URL of your background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: #fff; /* Text color on the background */
+    padding: 100px 0; /* Adjust the padding as needed */
+  }
+</style>
+{% endblock %}
